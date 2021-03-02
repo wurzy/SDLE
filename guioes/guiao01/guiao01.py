@@ -5,7 +5,7 @@ import numpy as np
 import random
 
 minN = 10
-maxN = 500
+maxN = 1000
 step = 10
 
 repeat = 30
@@ -38,4 +38,6 @@ for i in range(minN,maxN + step,step):
 plot.plot(x,y)
 plot.xlabel('Vertices')
 plot.ylabel('Edges')
-plot.show()
+plot.axis('scaled')
+plot.savefig('output.pdf')
+#plot.show()

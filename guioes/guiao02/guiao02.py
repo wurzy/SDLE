@@ -43,6 +43,10 @@ for u in range(minN,maxN+1):
     nodes.append(u)
     edges.append(nx.number_of_edges(g))
 
+nx.draw(g,with_labels=True)
+plot.draw()
+plot.show()
+
 plot.plot(nodes,edges)
 plot.xlabel('Nodes')
 plot.ylabel('# edges')

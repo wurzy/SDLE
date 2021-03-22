@@ -73,4 +73,5 @@ plot.xscale('log')
 plot.subplot(2,2,4)
 nx.draw(g,node_size=60,font_size=8) 
 
+#plot.savefig("output.pdf")
 plot.show()

@@ -48,7 +48,6 @@ for n in range(minN, maxN + step, step):
     nodes.append(n)
     edges.append(st.mean(cur))
 
-
 plot.subplot(2, 2, 1)
 plot.plot(nodes,edges)
 plot.xlabel('Nodes')

@@ -5,7 +5,7 @@ from collections import Counter
 import random
 
 minN = 10
-maxN = 100
+maxN = 300
 step = 1
 
 repeat = 30

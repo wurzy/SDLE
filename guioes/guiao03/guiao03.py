@@ -27,7 +27,10 @@ def flooding(graph, n):
 
     return counter
 
-def flooding_graphs(nr_nodes): 
+def gossip(graph, n): 
+    pass
+
+def flooding_plot(nr_nodes): 
     iterations = range(nr_nodes + 1)
     x, y1, y2 = [], [], []
     graph1, graph2 = None, None
@@ -56,4 +59,4 @@ def flooding_graphs(nr_nodes):
     nx.draw(graph2,node_size=60,font_size=8) 
     plot.show()
 
-flooding_graphs(nr_nodes)
+flooding_plot(nr_nodes)

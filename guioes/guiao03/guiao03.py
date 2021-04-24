@@ -49,7 +49,7 @@ def gossip(graph, n, percentage):
                 seen[node] = True
         counter += 1
         neighbors = new_neighbors
-    return sum(i == True for i in seen)
+    return sum(i == True for i in seen) / n
 
 def flooding_plot(nr_nodes): 
     iterations = range(nr_nodes + 1)
@@ -93,13 +93,13 @@ def gossip_plot(nr_nodes):
 
     plot.subplot(2, 2, 1)
     plot.scatter(x, y1)
-    plot.xlabel('Percentage')
-    plot.ylabel('# nodes/' + str(nr_nodes) + '(Erdos-Renyi)')
+    plot.xlabel('% Subset')
+    plot.ylabel('% nodes (Erdos-Renyi)')
 
     plot.subplot(2, 2, 2)
     plot.scatter(x, y2)
-    plot.xlabel('Percentage')
-    plot.ylabel('# nodes/' + str(nr_nodes) + '(Barabesi-Albert)')
+    plot.xlabel('% Subset')
+    plot.ylabel('% nodes (Barabesi-Albert)')
 
     plot.subplot(2, 2, 3)
     nx.draw(graph1,node_size=60,font_size=8) 

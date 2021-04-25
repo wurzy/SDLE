@@ -1,5 +1,7 @@
 import networkx as nx
 import random
+from itertools import combinations
+from random import choice, sample
 
 def erdos_renyi(n):
     g = nx.Graph()
@@ -19,12 +21,26 @@ def barabesi_albert(n):
         g.add_node(u)
         v = random.choice(choices)
         choices.append(u)
-        choices.append(u)
         choices.append(v)
         g.add_edge(u,v)
     return g
 
-#g = barabesi_albert(100)
-
-#nx.draw(g,node_size=60,font_size=8) 
-#plot.show()
+def barabesi_albert_redundance(n):
+    nodes = []
+    edges = []
+    g = nx.Graph()
+    choices = [0]
+    for u in range(1,n):
+        g.add_node(u)
+        v = random.choice(choices)
+        choices.append(u)
+        choices.append(v)
+        g.add_edge(u,v)
+    # needs redundance otherwise using a percentage of the subset will result in poor results
+    for u in range(1,n):
+        g.add_node(u)
+        v = random.choice(choices)
+        choices.append(u)
+        choices.append(v)
+        g.add_edge(u,v)
+    return g

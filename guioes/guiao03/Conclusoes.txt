@@ -1,0 +1,18 @@
+Conclusoes a tirar: 
+
+-> Erdos-Renyi: 
+    -> Flooding: 
+        - Comporta-se como esperado, atinge em O(diam) iterações todos os nodos do grafo. 
+        - Tipicamente menos iterações que no Preferential Attachment porque tem menor diâmetro
+    -> Gossip: 
+        - As mensagens são entregues consistentemente para percentagens acima de 50-60% (em média)
+        - Maior % no Subset equivale a uma entrega mais consistente das mensagens
+            
+-> Preferential Attachment (Barabesi Albert): 
+    -> Flooding: 
+        - Mesmas conclusões que o Erdos-Renyi
+    -> Gossip: 
+        - Houve necessidade de alterar o algoritmo original, acrescentando redundância
+        - Sem redundância, as mensagens não eram totalmente entregues aos nodos para subsets com percentagens abaixo de 80-90% por causa do "hub node" que conectava a todos.
+        - Isto porque grande parte dos nodos tem grau 1 e essa aresta ser para o "hub node", se ele selecionar nem que seja 90% dos nodos, os 10% não recebem mensagem de lado nenhum.
+        - Com redundância, já não há tantos nodos com grau 1, as conclusões são iguais às de Erdos-Renyi neste caso mas para uma percentagem mais baixa, 60-70%.

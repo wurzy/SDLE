@@ -35,15 +35,19 @@ class DHT:
     
     # Find the node responsible for the key
     def findNode(self, start, key):
+        #path = []
         hashId = self.getHashId(key)
         curr = start
         numJumps = 0
         while True:
+            #path.append(curr.ID)
             if curr.ID == hashId:
-                print("number of jumps: ", numJumps)
+                #print("number of jumps: ", numJumps)
+                #print("path1: ",path)
                 return curr
             if self.distance(curr.ID, hashId) <= self.distance(curr.fingerTable[0].ID, hashId):
-                print("number of jumps: ", numJumps)
+                #print("number of jumps: ", numJumps)
+                #print("path2: ",path)
                 return curr.fingerTable[0]
             tabSize = len(curr.fingerTable)
             i = 0;
@@ -54,8 +58,30 @@ class DHT:
                 i = i + 1
             curr = nextNode
             numJumps += 1
+    
+    def findPath(self,start,key):
+        path = []
+        hashId = self.getHashId(key)
+        curr = start
+        numJumps = 0
+        while True:
+            path.append(curr.ID)
+            if curr.ID == hashId:
+                #print("number of jumps: ", numJumps)
+                return path
+            if self.distance(curr.ID, hashId) <= self.distance(curr.fingerTable[0].ID, hashId):
+                #print("number of jumps: ", numJumps)
+                return path
+            tabSize = len(curr.fingerTable)
+            i = 0;
+            nextNode = curr.fingerTable[-1]
+            while i < tabSize - 1:
+                if self.distance(curr.fingerTable[i].ID, hashId) < self.distance(curr.fingerTable[i + 1].ID, hashId):
+                    nextNode = curr.fingerTable[i]
+                i = i + 1
+            curr = nextNode
+            numJumps += 1
             
-
     # Look up a key in the DHT
     def lookup(self, start, key):
         nodeForKey = self.findNode(start, key)

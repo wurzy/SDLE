@@ -1,15 +1,19 @@
 from dht.dht import *
 from random import randint
 
-d = DHT(5)
+d = DHT(4)
 
 # Add nodes
-for i in range(32):
-    d.join(Node(i))
+nodes = {}
+for i in range(16):
+    nodes[i] = Node(i)
+    d.join(nodes[i])
 
 tables = d.updateAllFingerTables()
 print(tables)
 
+path = d.findPath(nodes[11],10)
+print(path)
 
 #for i in range(5, 1024, 10):
 #    d.store(d._startNode, i, "hello" + str(i))

@@ -2,14 +2,16 @@ from chord.chord import *
 from kademlia.node import *
 from random import randint
 
-d = Chord(4)
+M = 4
+
+d = Chord(M)
 
 # Add nodes
 nodes = {}
 
 #nodesK = {}
 
-for i in range(16):
+for i in range(2**M):
     nodes[i] = Node(i)
 #    nodesK[i] = NodeK(4)
     d.join(nodes[i])

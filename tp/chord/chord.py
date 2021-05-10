@@ -1,6 +1,6 @@
 from .node import *
 # A Distributed Hash Table implementation
-class DHT:
+class Chord:
     # The total number of IDs available in the DHT is 2 ** k
     def __init__(self, k):
         self._k = k

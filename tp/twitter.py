@@ -22,6 +22,17 @@ print(tables)
 path = d.findPath(nodes[11],10)
 print(path)
 
+#d.leave(nodes[1])
+#d.leave(nodes[5])
+#d.leave(nodes[6])
+#d.leave(nodes[11])
+#tables = d.updateAllFingerTables()
+
+#print(tables)
+
+#path = d.findPath(nodes[11],10)
+#print(path)
+
 #for key,value in nodesK.items():
 #    print(key, value._id)
 

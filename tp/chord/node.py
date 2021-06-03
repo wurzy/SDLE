@@ -1,4 +1,6 @@
 from timeline.timeline import *
+from timeline.post import *
+from .chord import *
 
 class Node:
     def __init__(self, ID, nxt = None, prev = None):
@@ -6,7 +8,8 @@ class Node:
         self.data = dict()
         self.prev = prev
         self.fingerTable = [nxt]
-        self.timeline = Timeline()
+        self.timeline = []
+        self.subscribers = []
 
     # Update the finger table of this node when necessary
     def updateFingerTable(self, dht, k):
@@ -16,6 +19,19 @@ class Node:
             
     def getFingerTable(self):
         return [x.ID for x in self.fingerTable]
+
+    def registerSub(self, key):
+        print(f"Node {key} subscribed to node {self.ID}.")
+        self.subscribers.append(key)
+
+    def unregisterSub(self, key):
+        self.subscribers.remove(key)
     
-    def addToTimeline(self,post):
-        self.timeline.add(post)
+    def addToTimeline(self, post):
+        self.timeline.append(post)
+
+        if (self.ID == 11):
+            print("TIMELINE (node 11) ----------------------")
+            for post in self.timeline:
+                print(f"Node {post.user}: ...")
+            print()

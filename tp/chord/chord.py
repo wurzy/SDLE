@@ -1,4 +1,6 @@
 from .node import *
+from lorem_text import lorem
+
 # A Distributed Hash Table implementation
 class Chord:
     # The total number of IDs available in the DHT is 2 ** k
@@ -59,7 +61,7 @@ class Chord:
             curr = nextNode
             numJumps += 1
     
-    def findPath(self,start,key):
+    def findPath(self, start, key):
         path = []
         hashId = self.getHashId(key)
         curr = start
@@ -103,7 +105,7 @@ class Chord:
         # print(origNode.ID, "  ", newNode.ID)
         # If there is a node with the same id, decline the join request for now
         if origNode.ID == newNode.ID:
-            print("There is already a node with the same id!")
+            #print("There is already a node with the same id!")
             return
         
         # Copy the key-value pairs that will belong to the new node after
@@ -155,3 +157,25 @@ class Chord:
             table[curr.ID] = curr.getFingerTable()
             curr = curr.fingerTable[0]
         return table
+
+    def subscribe(self, subNode, key):
+        node = self.findNode(subNode, key)
+        node.registerSub(subNode.ID)
+
+    def unsubscribe(self, subNode, key):
+        node = self.findNode(subNode, key)
+        node.unregisterSub(subNode.ID)
+
+    def publish(self, node):
+        print("Posting: node", node.ID)
+        post = Post(node.ID, lorem.sentence())
+        node.addToTimeline(post)
+        self.notifySubscribers(node, post)
+
+    def notifySubscribers(self, node, post):
+        for sub in node.subscribers:
+            hops = len(self.findPath(node, sub))
+            print(f"Hops from {node.ID} to {sub}: {hops}")
+            
+            node = self.findNode(node, sub)
+            node.addToTimeline(post)

@@ -42,3 +42,18 @@ print(path)
 
 #for i in range(5, 200, 10):
 #    print(d.lookup(d._startNode, i))
+
+#TIMELINE HUGO
+
+print()
+d.subscribe(nodes[11],7)
+d.subscribe(nodes[11],10)
+d.subscribe(nodes[11],12)
+
+print()
+d.publish(nodes[11])
+d.publish(nodes[7])
+d.publish(nodes[11])
+d.publish(nodes[10])
+d.publish(nodes[12])
+d.publish(nodes[11])

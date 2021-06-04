@@ -10,17 +10,21 @@ class Menu:
     def print_menu(self):
         nr = int((79 - len(self.name) - 2)/2)
         if (nr * 2 + len(self.name) + 2) != 79:
-            print("=" * nr + " " + self.name + " " + "=" * (nr + 1))
+            firstLinep1 = ''.join(['+' if i%2==0 else '-' for i in range(nr)])
+            firstLinep2 = ''.join(['+' if i%2==0 else '-' for i in range(nr+1)])
+            print(firstLinep1,self.name,firstLinep2)
         else:
-            print("=" * nr + " " + self.name + " " + "=" * nr)
+            firstLine = ''.join(['+' if i%2==0 else '-' for i in range(nr)])
+            print(firstLine,self.name,firstLine)
         option = 1
         for item in self.items:
-            spaces = 79 - 6 - len(str(option)) - len(item.get_name())
-            print("| " + str(option) + ": " + item.get_name() +
+            spaces = 79 - 6 - len(str(option)) - len(item.get_name()) - 1
+            print("| " + str(option) + " - " + item.get_name() +
                   spaces * " " + " |")
             option += 1
 
-        print("=" * 79)
+        lastLine = ''.join(['+' if i%2==0 else '-' for i in range(79)])
+        print(lastLine)
 
     def execute(self):
         while(self.option == -1):
@@ -37,9 +41,9 @@ class Menu:
         try:
             if int(option) <= 0 or int(option) > len(self.items):
                 self.option = -1
-                print("Escolhida opção inválida!")
+                print("Opção inválida!")
             else:
                 self.option = int(option)
         except ValueError:
             self.option = -1
-            print("Opção deve ser numérica!")
+            print("Input inválido!")

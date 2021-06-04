@@ -8,7 +8,6 @@ import asyncio
 import settings
 import re
 
-from utils.prompt import Prompt
 from threading import Thread
 from kademlia_server import KademliaServer
 from node import Node
@@ -17,15 +16,13 @@ from utils.menu.menu_item import MenuItem
 
 LOOP = None
 NODE = None
-PROMPT = None
 KS = None
 AUTH_MENU = None
 MAIN_MENU = None
 
 async def post_message():
-    global KS, NODE, PROMPT
+    global KS, NODE
 
-    #message = await PROMPT("Enter Message: \n")
     message = input("Message: ")
 
     try:
@@ -38,9 +35,8 @@ async def post_message():
 
 
 async def follow_user():
-    global LOOP, KS, NODE, PROMPT
+    global LOOP, KS, NODE
 
-    #username = await PROMPT("Enter username: ")
     username = input("Follow user: ")
 
     try:
@@ -56,9 +52,8 @@ def show_timeline():
     NODE.show_timeline()
 
 async def login():
-    global NODE, KS, PROMPT
+    global NODE, KS
 
-    #username = await PROMPT("Username: ")
     username = input("Username: ")
 
     try:
@@ -74,14 +69,13 @@ async def login():
 
 async def logout():
     global NODE, KS
-
     NODE.logout()
     KS.close_server()
     return False
 
 async def register(address, port):
-    global NODE, KS, PROMPT
-    #username = await PROMPT("Username: ")
+    global NODE, KS
+
     username = input("Username: ")
 
     try:
@@ -106,10 +100,10 @@ def build_main_menu():
 
 
 def build_auth_menu(address, port):
-    menu = Menu("Authentication")
+    menu = Menu("Welcome")
     menu.append_item(MenuItem("Login", login))
     menu.append_item(MenuItem("Register", register, address, port))
-
+    menu.append_item(MenuItem("Logout", logout))
     return menu
 
 
@@ -135,16 +129,13 @@ def run_auth_menu():
 
 
 def main(address, port):
-    global KS, LOOP, PROMPT
+    global KS, LOOP
 
     bt_addresses_p = [address_port.split(":")
                       for address_port in settings.BOOTSTRAP_NODES.split(",")]
     bt_addresses = [(x, int(y)) for [x, y] in bt_addresses_p] 
-    print(bt_addresses)
     KS = KademliaServer(address, port)
     LOOP = KS.start_server(bt_addresses)
-
-    PROMPT = Prompt(LOOP)
 
     Thread(target=LOOP.run_forever, daemon=True).start()
 

@@ -1,11 +1,11 @@
 TODO:
 
-- Logout a funcioonar direito
-- Mudar a storage do programa
+- Mudar a storage do programa (Mongo)
 - Remover subscrição
 - Timeline com limite máximo de mensagens
+- Registar a funcionar com pw + hash da pw 
 
 DONE:
 
-- Registar a funcionar com pw + hash da pw 
 - Vector clocks
+- Logout funcional + exit do programa

@@ -98,11 +98,11 @@ async def register(address, port):
 
 def build_main_menu():
     menu = Menu("Timeline")
-
     menu.append_item(MenuItem("Show timeline", show_timeline))
     menu.append_item(MenuItem("Write a message", post_message))
     menu.append_item(MenuItem("Subscribe user", follow_user))
     menu.append_item(MenuItem("Logout", logout))
+
     return menu
 
 
@@ -111,6 +111,7 @@ def build_auth_menu(address, port):
     menu.append_item(MenuItem("Login", login))
     menu.append_item(MenuItem("Register", register, address, port))
     menu.append_item(MenuItem("Quit", leave))
+    
     return menu
 
 

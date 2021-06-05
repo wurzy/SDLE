@@ -19,6 +19,8 @@ NODE = None
 KS = None
 AUTH_MENU = None
 MAIN_MENU = None
+ADDRESS = None
+PORT = None
 
 async def post_message():
     global KS, NODE
@@ -96,11 +98,11 @@ async def register(address, port):
 
 def build_main_menu():
     menu = Menu("Timeline")
-
     menu.append_item(MenuItem("Show timeline", show_timeline))
-    menu.append_item(MenuItem("Follow user", follow_user))
-    menu.append_item(MenuItem("Post a message", post_message))
+    menu.append_item(MenuItem("Write a message", post_message))
+    menu.append_item(MenuItem("Subscribe user", follow_user))
     menu.append_item(MenuItem("Logout", logout))
+
     return menu
 
 
@@ -109,6 +111,7 @@ def build_auth_menu(address, port):
     menu.append_item(MenuItem("Login", login))
     menu.append_item(MenuItem("Register", register, address, port))
     menu.append_item(MenuItem("Quit", leave))
+    
     return menu
 
 
@@ -117,11 +120,11 @@ def run_main_menu():
     MAIN_MENU = build_main_menu()
     while True:
         res = MAIN_MENU.execute()
+        input("Press any key to continue...")
         if res is False:
             break
-        input("Press any key to continue...")
-
-
+    main(ADDRESS,PORT)
+    
 def run_auth_menu():
     global AUTH_MENU
     AUTH_MENU = build_auth_menu(address, port)
@@ -150,7 +153,6 @@ def main(address, port):
 
 
 if __name__ == "__main__":
-
     ap = argparse.ArgumentParser()
     ap.add_argument('-a', '--address', type=str, help="Host IP Address",
                     default="localhost", required=True)
@@ -165,5 +167,8 @@ if __name__ == "__main__":
        and address != "localhost":
         sys.stderr.write('Address format is not valid.')
         sys.exit()
+
+    ADDRESS = address 
+    PORT = port
 
     main(address, port)

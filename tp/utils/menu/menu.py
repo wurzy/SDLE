@@ -19,8 +19,8 @@ class Menu:
         option = 1
         for item in self.items:
             spaces = 79 - 6 - len(str(option)) - len(item.get_name()) - 1
-            print("| " + str(option) + " - " + item.get_name() +
-                  spaces * " " + " |")
+            print("+ " + str(option) + " - " + item.get_name() +
+                  spaces * " " + " +")
             option += 1
 
         lastLine = ''.join(['+' if i%2==0 else '-' for i in range(79)])

@@ -2,6 +2,7 @@ import logging
 import asyncio
 import sys
 import json
+import bcrypt
 
 from threading import *
 from kademlia.network import Server
@@ -41,10 +42,11 @@ class KademliaServer:
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.server.stop()
 
-    async def register(self, username):
+    async def register(self, username, password):
         result = await self.server.get(username)
         if result is None:
             value = {
+                "password": password.decode(),
                 "followers": [],
                 "following": {username: (0, 0)},
                 "redirect": {},
@@ -58,12 +60,18 @@ class KademliaServer:
         else:
             raise Exception("Username already exists")
 
-    async def login(self, username):
+    async def login(self, username, password):
         result = await self.server.get(username)
         result = json.loads(result)
 
         if result is not None:
+            encoded = result['password'].encode()
+
+            if not bcrypt.checkpw(password,encoded):
+                raise Exception("Incorrect credentials, try again")
+
             value = {
+                "password": result['password'],
                 "followers": result['followers'],
                 "following": result['following'],
                 "redirect": result['redirect'],

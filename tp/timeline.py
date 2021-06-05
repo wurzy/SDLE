@@ -148,7 +148,6 @@ class Timeline:
                                                '%Y-%m-%d %H:%M:%S')
 
                 self.messages = data
-                print(data)
         except:
             self.messages = {}
         #self.messages = self.mongo.getTimeline()

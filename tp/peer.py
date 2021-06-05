@@ -7,6 +7,7 @@ import sys
 import asyncio
 import settings
 import re
+import bcrypt
 
 from threading import Thread
 from kademlia_server import KademliaServer
@@ -57,9 +58,10 @@ async def login():
     global NODE, KS
 
     username = input("Username: ")
+    password = input("Password: ")
 
     try:
-        state = await KS.login(username)
+        state = await KS.login(username, password.encode())
         NODE = Node(address, port, username, KS, state)
         await NODE.update_timeline_messages()
         print("Login was successful")
@@ -84,9 +86,13 @@ async def register(address, port):
     global NODE, KS
 
     username = input("Username: ")
+    password = input("Password: ")
+
+    salt = bcrypt.gensalt(rounds=16)
+    hash = bcrypt.hashpw(password.encode(), salt)
 
     try:
-        state = await KS.register(username)
+        state = await KS.register(username,hash)
         NODE = Node(address, port, username, KS, state)
         print("Registration was successful")
 
@@ -111,7 +117,7 @@ def build_auth_menu(address, port):
     menu.append_item(MenuItem("Login", login))
     menu.append_item(MenuItem("Register", register, address, port))
     menu.append_item(MenuItem("Quit", leave))
-    
+
     return menu
 
 

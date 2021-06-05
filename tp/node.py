@@ -254,7 +254,10 @@ class Listener(Thread):
     def run(self):
         global LIST_LOOP
         LIST_LOOP = asyncio.new_event_loop()
-        result = LIST_LOOP.run_until_complete(self.start_listener())
+        try:
+            result = LIST_LOOP.run_until_complete(self.start_listener())
+        except Exception:
+            pass
 
 
 class Node:

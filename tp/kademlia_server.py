@@ -38,6 +38,7 @@ class KademliaServer:
         return self.loop
 
     def close_server(self):
+        self.loop.call_soon_threadsafe(self.loop.stop)
         self.server.stop()
 
     async def register(self, username):

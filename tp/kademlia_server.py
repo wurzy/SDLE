@@ -76,14 +76,14 @@ class KademliaServer:
             return value
 
         else:
-            raise Exception("User doesn't exist! Please register")
+            raise Exception("Invalid user, register first")
 
     async def get_user_ip(self, username):
         result = await self.server.get(username)
         result = json.loads(result)
 
         if result is None:
-            raise Exception("User doesn't exist!")
+            raise Exception("Invalid user")
         else:
             return (result["ip"], result["port"])
 
@@ -92,7 +92,7 @@ class KademliaServer:
         result = json.loads(result)
 
         if result is None:
-            raise Exception("User doesn't exist!")
+            raise Exception("Invalid user")
         else:
             return (result["ip"], result["port"], result["msg_nr"])
 

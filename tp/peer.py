@@ -60,7 +60,7 @@ async def login():
         state = await KS.login(username)
         NODE = Node(address, port, username, KS, state)
         await NODE.update_timeline_messages()
-        print("Login com sucesso!")
+        print("Login was successful")
 
         return 1
     except Exception as e:
@@ -73,6 +73,11 @@ async def logout():
     KS.close_server()
     return False
 
+async def leave():
+    global KS
+    KS.close_server()
+    return None
+
 async def register(address, port):
     global NODE, KS
 
@@ -81,7 +86,7 @@ async def register(address, port):
     try:
         state = await KS.register(username)
         NODE = Node(address, port, username, KS, state)
-        print("Registado com sucesso!")
+        print("Registration was successful")
 
         return 1
     except Exception as e:
@@ -90,7 +95,7 @@ async def register(address, port):
 
 
 def build_main_menu():
-    menu = Menu("Main Menu")
+    menu = Menu("Timeline")
 
     menu.append_item(MenuItem("Show timeline", show_timeline))
     menu.append_item(MenuItem("Follow user", follow_user))
@@ -103,7 +108,7 @@ def build_auth_menu(address, port):
     menu = Menu("Welcome")
     menu.append_item(MenuItem("Login", login))
     menu.append_item(MenuItem("Register", register, address, port))
-    menu.append_item(MenuItem("Logout", logout))
+    menu.append_item(MenuItem("Quit", leave))
     return menu
 
 
@@ -114,7 +119,7 @@ def run_main_menu():
         res = MAIN_MENU.execute()
         if res is False:
             break
-        input("press enter to continue...")
+        input("Press any key to continue...")
 
 
 def run_auth_menu():
@@ -122,7 +127,9 @@ def run_auth_menu():
     AUTH_MENU = build_auth_menu(address, port)
     while True:
         auth_successful = AUTH_MENU.execute()
-        input("press enter to continue..")
+        if auth_successful == None:
+            break
+        input("Press any key to continue...")
         if auth_successful == 1:
             run_main_menu()
             break

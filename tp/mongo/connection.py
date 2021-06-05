@@ -1,15 +1,37 @@
 import pymongo
+from datetime import datetime, timedelta
 
 class MongoController:
 
-    def __init__(self):
+    def __init__(self, user):
         self.conn = pymongo.MongoClient("mongodb://localhost:27017/")
         self.db = self.conn["SDLE"]
-        self.timeline = self.db["timeline"]
-        self.queue = self.db["queue"]
+        self.timeline = self.db[user + "_timeline"]
+        self.queue = self.db[user + "_queue"]
+        self.user = user
 
-    def saveMessage(self,msg,user):
-        self.timeline.insert_one(msg)
+    def saveMessage(self,user,msg):
+        if not self.timeline.count_documents({ 'user': user }, limit = 1):
+            self.timeline.insert_one({'user': user, 'messages': []})
+        self.timeline.update({'user': user}, { "$push": { "messages": msg } })
 
-    def saveMessageInQueue(self,msg):
-        self.queue.insert_one(msg)
+    def saveMessageInQueue(self,user,msg):
+        if not self.queue.count_documents({ 'user': user }, limit = 1):
+            self.queue.insert_one({'user': user, 'messages': []})
+        self.queue.update({'user': user}, { "$push": { "messages": msg } })
+
+    def getTimeline(self):
+        try:
+            messages = {}
+            for user_msgs in self.timeline.find():
+                user = user_msgs['user']
+                messages[user] = {}
+                for msg in user_msgs['messages']:
+                    msg['time'] = datetime.strptime(msg['time'],'%Y-%m-%d %H:%M:%S')
+                    msg['id'] = int(msg['id'])
+                    msg_nr = msg['msg_nr']
+                    messages[user][str(msg_nr)] = msg
+        except Exception: 
+            messages = {}    
+        finally:
+            return messages

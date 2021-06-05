@@ -6,6 +6,7 @@ import settings
 import utils.flake as flake
 
 from datetime import datetime, timedelta
+from mongo.connection import MongoController
 
 DISCARD_BASELINE = settings.DISCARD_BASELINE
 
@@ -34,6 +35,7 @@ class Timeline:
     def __init__(self, username):
         self.username = username
         self.lock = threading.RLock()
+        self.mongo = MongoController(username)
         self.get_timeline()
 
     def __repr__(self):
@@ -146,8 +148,10 @@ class Timeline:
                                                '%Y-%m-%d %H:%M:%S')
 
                 self.messages = data
+                print(data)
         except:
             self.messages = {}
+        #self.messages = self.mongo.getTimeline()
 
         try:
             filename = 'messages/' + self.username + '-w-messages.json'

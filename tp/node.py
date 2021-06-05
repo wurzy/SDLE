@@ -290,20 +290,22 @@ class Node:
 
     async def post_message(self, message, followers):
         global USERNAME, TIMELINE, STATE, FOLLOWERS_CONS
-
-        STATE['msg_nr'] += 1
+        
         msg_id = self.id_generator.__next__()
+        msg_nr = STATE['following'][USERNAME][0] + 1
+
+        STATE['following'][USERNAME] = (msg_nr, msg_id)
 
         time = flake.get_datetime_from_id(msg_id)
 
         # Add to timeline
-        TIMELINE.add_message(USERNAME, message, msg_id, STATE['msg_nr'], time)
+        TIMELINE.add_message(USERNAME, message, msg_id, msg_nr, time)
 
         data = {
             "post": {
                 "username": USERNAME,
                 "message": message,
-                "msg_nr": STATE['msg_nr'],
+                "msg_nr": msg_nr,
                 "id": msg_id
             }
         }
@@ -364,20 +366,19 @@ class Node:
 
     def show_timeline(self):
         global TIMELINE
-
         print(TIMELINE)
 
     async def follow_user(self, to_follow, loop):
         global USERNAME, STATE
-
-        if to_follow in STATE["following"]:
-            print("You already follow that user!!")
 
         (ip, port, msg_nr) = await KS.get_user_ip_msgnr(to_follow)
 
         if to_follow == USERNAME:
             print("You can't follow yourself!")
             return
+
+        elif to_follow in STATE["following"]:
+            print("You already follow that user!!")
 
         try:
             (reader, writer) = await asyncio.open_connection(

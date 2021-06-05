@@ -1,0 +1,11 @@
+TODO:
+
+- Logout a funcioonar direito
+- Mudar a storage do programa
+- Remover subscrição
+- Timeline com limite máximo de mensagens
+
+DONE:
+
+- Registar a funcionar com pw + hash da pw 
+- Vector clocks

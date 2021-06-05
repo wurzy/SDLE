@@ -46,9 +46,8 @@ class KademliaServer:
         if result is None:
             value = {
                 "followers": [],
-                "following": {},
+                "following": {username: (0, 0)},
                 "redirect": {},
-                "msg_nr": 0,
                 "ip": self.ip,
                 "port": self.port
             }
@@ -68,7 +67,6 @@ class KademliaServer:
                 "followers": result['followers'],
                 "following": result['following'],
                 "redirect": result['redirect'],
-                "msg_nr": result['msg_nr'],
                 "ip": self.ip,
                 "port": self.port
             }
@@ -95,7 +93,7 @@ class KademliaServer:
         if result is None:
             raise Exception("Invalid user")
         else:
-            return (result["ip"], result["port"], result["msg_nr"])
+            return (result["ip"], result["port"], result["following"][username][0])
 
     async def get_location_and_followers(self, usernames):
         res = {}
@@ -139,13 +137,13 @@ class KademliaServer:
             user_knowledge = info[0]
             result = await self.server.get(follw)
             result = json.loads(result)
-            if (result is not None) and result['msg_nr'] > user_knowledge:
-                res.append((follw, result["ip"], result["port"],
-                            result["msg_nr"]))
+            msg_nr = result["following"][follw][0]
+            if (result is not None) and msg_nr > user_knowledge:
+                res.append((follw, result["ip"], result["port"], msg_nr))
 
         return res
 
-    async def get_user_following(self, state):
+    """ async def get_user_following(self, state):
         following = {}
 
         result = await self.get_user(username)
@@ -157,7 +155,7 @@ class KademliaServer:
                 following[follw] = (result["ip"],
                                     result["port"])
 
-        return following
+        return following """
 
     async def get_user(self, username):
         result = await self.server.get(username)

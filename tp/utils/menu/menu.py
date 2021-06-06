@@ -41,9 +41,9 @@ class Menu:
         try:
             if int(option) <= 0 or int(option) > len(self.items):
                 self.option = -1
-                print("Opção inválida!")
+                print("Invalid option!")
             else:
                 self.option = int(option)
         except ValueError:
             self.option = -1
-            print("Input inválido!")
+            print("Invalid input!")

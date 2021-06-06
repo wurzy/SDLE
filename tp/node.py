@@ -178,23 +178,34 @@ async def node_server(reader, writer):
             msg_nr = data["post"]["msg_nr"]
             time = flake.get_datetime_from_id(data["post"]["id"])
             user_knowledge = STATE["following"][sender][0]
+            
             TIMELINE.add_message(sender, message, msg_id, msg_nr, time,
                                  user_knowledge)
 
-            if (user_knowledge is None or msg_nr == user_knowledge + 1):
+            user_knowledge_split = user_knowledge.split('-')
+            user_knowledge_split[-1] = str(int(user_knowledge_split[len(user_knowledge_split)-1])+1)
+            user_knowledge_inc = '-'.join(user_knowledge_split)
+
+            if (user_knowledge is None or msg_nr == user_knowledge_inc):
                 STATE["following"][sender] = (msg_nr, msg_id)
                 value = json.dumps(STATE)
                 future = asyncio.run_coroutine_threadsafe(
                                     KS.set_user(USERNAME, value),
                                     LOOP)
                 future.result()
-            elif msg_nr > user_knowledge + 1:
+            elif msg_nr > user_knowledge_inc:
                 waiting_msgs = TIMELINE.user_waiting_messages(sender)
                 wanted_msgs = []
 
-                for msg_id in range(user_knowledge + 1, msg_nr):
-                    if msg_id not in waiting_msgs:
-                        wanted_msgs.append(msg_id)
+                username = '-'.join(msg_nr.split('-').pop())
+                user_knowledge_nr = int(user_knowledge.split('-')[-1])
+                msg_nr_nr = int(msg_nr.split('-')[-1])
+
+                for msg_id in range(user_knowledge_nr + 1, msg_nr_nr):
+                    msg_id_complete = username + '-' + str(msg_id)
+
+                    if msg_id_complete not in waiting_msgs:
+                        wanted_msgs.append(msg_id_complete)
 
                     messages = await request_messages(sender,
                                                       wanted_msgs,
@@ -312,7 +323,10 @@ class Node:
         global USERNAME, TIMELINE, STATE, FOLLOWERS_CONS
         
         msg_id = self.id_generator.__next__()
-        msg_nr = STATE['following'][USERNAME][0] + 1
+
+        msg_nr_split = STATE['following'][USERNAME][0].split("-")
+        msg_nr_split[-1] = str(int(msg_nr_split[-1])+1)
+        msg_nr = '-'.join(msg_nr_split)
 
         STATE['following'][USERNAME] = (msg_nr, msg_id)
 
@@ -349,7 +363,13 @@ class Node:
             waiting_msgs = TIMELINE.user_waiting_messages(follw)
             wanted_msgs = []
 
-            for msg_nr in range(current_knowledge + 1, user_knowledge + 1):
+            username = '-'.join(current_knowledge.split('-').pop())
+            current_knowledge_nr = int(current_knowledge.split('-')[-1])
+            user_knowledge_nr = int(user_knowledge.split('-')[-1])
+
+            for msg_nr in range(current_knowledge_nr + 1, user_knowledge_nr + 1):
+                msg_nr_complete = username + '-' + str(msg_nr)
+
                 if msg_nr not in waiting_msgs:
                     wanted_msgs.append(msg_nr)
 
@@ -509,7 +529,11 @@ async def handle_messages(messages, thread_safe=False):
             await send_message_to_users(redirects, json_string, REDIRECT_CONS)
 
         user_knowledge = STATE["following"][sender][0]
-        if user_knowledge is None or msg_nr == user_knowledge + 1:
+        user_knowledge_split = user_knowledge.split('-')
+        user_knowledge_split[-1] = str(int(user_knowledge_split[-1])+1)
+        user_knowledge_inc = '-'.join(user_knowledge_split)
+
+        if user_knowledge is None or msg_nr == user_knowledge_inc:
             STATE["following"][sender] = (msg_nr, msg_id)
 
     value = json.dumps(STATE)

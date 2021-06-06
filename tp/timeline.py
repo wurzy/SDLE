@@ -56,7 +56,7 @@ class Timeline:
             time = msg.get("time").strftime('%Y-%m-%d %H:%M:%S')
 
             result += "-" * 79 + "\n"
-            result += time + """ "(" + str(msg.get("msg_nr")) + ")" + """ " - "
+            result += time + " - " #+ "(" + str(msg.get("msg_nr")) + ")" 
             result += msg.get("username") + ": " + msg.get("message")
             result += "\n"
 
@@ -85,10 +85,8 @@ class Timeline:
         self.lock.acquire()
 
         messages = dict(self.messages)
-        for user, msgs in self.messages.items():
-            if user == self.username:
-                continue
 
+        for user, msgs in self.messages.items():
             user_msgs = dict(msgs)
 
             for msg_nr, msg in msgs.items():
@@ -113,7 +111,14 @@ class Timeline:
 
         self.lock.acquire()
 
-        if (user_knowledge is None) or (msg_nr == user_knowledge + 1):
+        user_knowledge_inc = ""
+
+        if (user_knowledge is not None):
+            user_knowledge_split = user_knowledge.split('-')
+            user_knowledge_split[len(user_knowledge_split)-1] = str(int(user_knowledge_split[len(user_knowledge_split)-1])+1)
+            user_knowledge_inc = '-'.join(user_knowledge_split)
+
+        if (user_knowledge is None) or (msg_nr == user_knowledge_inc):
             user_msgs = self.messages.get(user, {})
             user_msgs[msg_nr] = (timeline_entry.get_dict())
             user_knowledge = msg_nr
@@ -121,11 +126,14 @@ class Timeline:
             while(user_knowledge in self.waiting_messages):
                 msg = self.waiting_messages.pop(user_knowledge)
                 user_msgs[user_knowledge] = msg
-                user_knowledge += 1
+
+                user_knowledge_split = user_knowledge.split('-')
+                user_knowledge_split[len(user_knowledge_split)-1] = str(int(user_knowledge_split[len(user_knowledge_split)-1])+1)
+                user_knowledge = '-'.join(user_knowledge_split)
 
             self.messages[user] = user_msgs
 
-        elif msg_nr > user_knowledge + 1:
+        elif msg_nr > user_knowledge_inc:
             user_msgs = self.waiting_messages.get(user, {})
             user_msgs[msg_nr] = (timeline_entry.get_dict())
             self.waiting_messages[user] = user_msgs

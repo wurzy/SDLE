@@ -48,7 +48,7 @@ class KademliaServer:
             value = {
                 "password": password.decode(),
                 "followers": [],
-                "following": {username: (0, 0)},
+                "following": {username: (username+'-0', 0)},
                 "redirect": {},
                 "ip": self.ip,
                 "port": self.port

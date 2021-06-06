@@ -154,6 +154,23 @@ async def node_server(reader, writer):
                 writer.write(b'1\n')
                 await writer.drain()
 
+        elif 'unfollow' in data:
+            unfollower = data["unfollow"]["username"]
+
+            if unfollower not in STATE['followers']:
+                writer.write(b'0\n')
+                await writer.drain()
+            else:
+                STATE["followers"].remove(unfollower)
+                value = json.dumps(STATE)
+
+                future = asyncio.run_coroutine_threadsafe(
+                                 KS.set_user(USERNAME, value),
+                                 LOOP)
+                future.result()
+                writer.write(b'1\n')
+                await writer.drain()
+
         elif 'post' in data:
             sender = data["post"]["username"]
             message = data["post"]["message"]
@@ -417,6 +434,52 @@ class Node:
         else:
             print("It's not possible to follow %s (already followed)"
                   % to_follow)
+
+    async def unfollow_user(self, to_unfollow, loop):
+        global USERNAME, STATE
+
+        (ip, port, msg_nr) = await KS.get_user_ip_msgnr(to_unfollow)
+
+        if to_unfollow == USERNAME:
+            print("You can't unfollow yourself!")
+            return
+
+        elif to_unfollow not in STATE["following"]:
+            print("You already don't follow that user!!") 
+
+        try:
+            (reader, writer) = await asyncio.open_connection(
+                               ip, port, loop=loop)
+        except Exception:
+            print("It's not possible to unfollow that user right now!"
+                  "(user offline)")
+            return
+
+        data = {
+            "unfollow": {
+                "username": USERNAME
+            }
+        }
+
+        json_string = json.dumps(data) + '\n'
+        writer.write(json_string.encode())
+        await writer.drain()
+
+        data = (await reader.readline()).strip()
+
+        writer.close()
+
+        if data.decode() == '1':
+            print("You unfollowed %s successfully" % to_unfollow)
+
+            del STATE["following"][to_unfollow]
+            value = json.dumps(STATE)
+
+            await KS.set_user(USERNAME, value)
+
+        else:
+            print("It's not possible to unfollow %s (already not followed)"
+                  % to_unfollow)
 
 async def handle_messages(messages, thread_safe=False):
 

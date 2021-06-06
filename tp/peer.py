@@ -48,6 +48,18 @@ async def follow_user():
         return
 
 
+async def unfollow_user():
+    global LOOP, KS, NODE
+
+    username = input("Unfollow user: ")
+
+    try:
+        await NODE.unfollow_user(username, LOOP)
+    except Exception as e:
+        print(e)
+        return
+
+
 def show_timeline():
     global MAIN_MENU, NODE
 
@@ -101,6 +113,7 @@ def build_main_menu():
     menu.append_item(MenuItem("Show timeline", show_timeline))
     menu.append_item(MenuItem("Write a message", post_message))
     menu.append_item(MenuItem("Subscribe user", follow_user))
+    menu.append_item(MenuItem("Remove subscription", unfollow_user))
     menu.append_item(MenuItem("Logout", logout))
 
     return menu

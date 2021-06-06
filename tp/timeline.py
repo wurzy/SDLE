@@ -54,7 +54,7 @@ class Timeline:
             time = msg.get("time").strftime('%Y-%m-%d %H:%M:%S')
 
             result += "-" * 79 + "\n"
-            result += time + "(" + str(msg.get("msg_nr")) + ")" + " - "
+            result += time + """ "(" + str(msg.get("msg_nr")) + ")" + """ " - "
             result += msg.get("username") + ": " + msg.get("message")
             result += "\n"
 

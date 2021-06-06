@@ -1,6 +1,7 @@
 TODO:
 
 - Mudar a storage do programa (Mongo)
+    - Adicionar metodos de limpar as collections por causa do estado
 - Timeline com limite máximo de mensagens
 
 DONE:

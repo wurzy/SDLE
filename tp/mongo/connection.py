@@ -20,6 +20,16 @@ class MongoController:
             self.queue.insert_one({'user': user, 'messages': []})
         self.queue.update({'user': user}, { "$push": { "messages": msg } })
 
+    def saveMessages(self, timeline:dict):
+        for user,msgs in timeline.items():
+            for msg in msgs.values():
+                self.saveMessage(user,msg)
+
+    def saveQueue(self, queue:dict):
+        for user,msgs in queue.items():
+            for msg in msgs.values():
+                self.saveMessageInQueue(user,msg)
+
     def getTimeline(self):
         try:
             messages = {}
@@ -31,7 +41,29 @@ class MongoController:
                     msg['id'] = int(msg['id'])
                     msg_nr = msg['msg_nr']
                     messages[user][str(msg_nr)] = msg
-        except Exception: 
+        except Exception as e:
+            print("Error mongoDB Timeline: ", e) 
             messages = {}    
         finally:
             return messages
+    
+    def getQueue(self):
+        try:
+            messages = {}
+            for user_msgs in self.queue.find():
+                user = user_msgs['user']
+                messages[user] = {}
+                for msg in user_msgs['messages']:
+                    msg['time'] = datetime.strptime(msg['time'],'%Y-%m-%d %H:%M:%S')
+                    msg['id'] = int(msg['id'])
+                    msg_nr = msg['msg_nr']
+                    messages[user][str(msg_nr)] = msg
+        except Exception as e:
+            print("Error mongoDB Queue: ", e) 
+            messages = {}    
+        finally:
+            return messages
+
+    def dropCollections(self):
+        self.timeline.drop()
+        self.queue.drop()

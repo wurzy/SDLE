@@ -145,35 +145,38 @@ class Timeline:
         self.save_messages()
 
     def get_timeline(self):
-        try:
-            filename = 'messages/' + self.username + '-messages.json'
-            with open(filename, 'r') as infile:
-                data = json.load(infile)
-                for msgs in data.values():
-                    for msg in msgs.values():
-                        msg['time'] = datetime.strptime(
-                                               msg['time'],
-                                               '%Y-%m-%d %H:%M:%S')
+        #try:
+        #    filename = 'messages/' + self.username + '-messages.json'
+        #    with open(filename, 'r') as infile:
+        #        data = json.load(infile)
+        #        for msgs in data.values():
+        #            for msg in msgs.values():
+        #                msg['time'] = datetime.strptime(
+        #                                       msg['time'],
+        #                                       '%Y-%m-%d %H:%M:%S')
+#
+        #        self.messages = data
+        #except:
+        #    self.messages = {}
+        self.messages = self.mongo.getTimeline()
 
-                self.messages = data
-        except:
-            self.messages = {}
-        #self.messages = self.mongo.getTimeline()
+        #try:
+        #    filename = 'messages/' + self.username + '-w-messages.json'
+        #    with open(filename, 'r') as infile:
+        #        data = json.load(infile)
+        #        for msgs in data.values():
+        #            for msg in msgs.values():
+        #                msg['time'] = datetime.strptime(
+        #                                       msg['time'],
+        #                                       '%Y-%m-%d %H:%M:%S')
+        #        self.waiting_messages = data
+        #except:
+        #    self.waiting_messages = {}
 
-        try:
-            filename = 'messages/' + self.username + '-w-messages.json'
-            with open(filename, 'r') as infile:
-                data = json.load(infile)
-                for msgs in data.values():
-                    for msg in msgs.values():
-                        msg['time'] = datetime.strptime(
-                                               msg['time'],
-                                               '%Y-%m-%d %H:%M:%S')
-                self.waiting_messages = data
-        except:
-            self.waiting_messages = {}
+        self.waiting_messages = self.mongo.getQueue()
 
     def save_messages(self):
+        self.mongo.dropCollections()
         self.save_current_messages()
         self.save_waiting_messages()
 
@@ -185,16 +188,18 @@ class Timeline:
             for msg_nr, msg in msgs.items():
                 new_msg = dict(msg)
                 new_msg['time'] = new_msg['time'].strftime('%Y-%m-%d %H:%M:%S')
+                new_msg['id'] = str(new_msg['id'])
                 user_msgs[msg_nr] = new_msg
             messages[user] = user_msgs
+        self.mongo.saveMessages(messages)
         self.lock.release()
-        if not os.path.isdir('messages'):
-            os.mkdir('messages')
-
-        filename = 'messages/' + self.username + '-messages.json'
-
-        with open(filename, 'w') as outfile:
-            json.dump(messages, outfile)
+        #if not os.path.isdir('messages'):
+        #    os.mkdir('messages')
+#
+        #filename = 'messages/' + self.username + '-messages.json'
+#
+        #with open(filename, 'w') as outfile:
+        #    json.dump(messages, outfile)
 
     def save_waiting_messages(self):
         messages = {}
@@ -204,14 +209,16 @@ class Timeline:
             for msg_nr, msg in msgs.items():
                 new_msg = dict(msg)
                 new_msg['time'] = new_msg['time'].strftime('%Y-%m-%d %H:%M:%S')
+                new_msg['id'] = str(new_msg['id'])
                 user_msgs[msg_nr] = new_msg
             messages[user] = user_msgs
+        self.mongo.saveQueue(messages)
         self.lock.release()
 
-        if not os.path.isdir('messages'):
-            os.mkdir('messages')
-
-        filename = 'messages/' + self.username + '-w-messages.json'
-
-        with open(filename, 'w') as outfile:
-            json.dump(messages, outfile)
+        #if not os.path.isdir('messages'):
+        #    os.mkdir('messages')
+#
+        #filename = 'messages/' + self.username + '-w-messages.json'
+#
+        #with open(filename, 'w') as outfile:
+        #    json.dump(messages, outfile)

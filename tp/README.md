@@ -1,10 +1,10 @@
 # Decentralized Timeline
 
-A peer-to-peer timeline service, using Kademlia and Python's asyncio module.
-
+P2P decentralized Timeline using Kademlia, Asyncio and MongoDB in Python.
 
 ## Authors
 
-* [Daniel Fernandes](https://github.com/danielsf97)
-* [Helena Poleri](https://github.com/helenapoleri)
-* [Mariana Miranda](https://github.com/mmm97)
+* [Hugo Cardoso](https://github.com/Abjiri)
+* [José Oliveira](https://github.com/PedroSilva9)
+* [Pedro Rodrigues](https://github.com/pedrordgs)
+* [Válter Carvalho](https://github.com/wurzy)

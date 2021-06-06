@@ -1,10 +1,9 @@
 TODO:
 
-- Mudar a storage do programa (Mongo)
-    - Adicionar metodos de limpar as collections por causa do estado
-
 DONE:
 
+- Mudar a storage do programa (Mongo)
+- Adicionar metodos de limpar as collections por causa do estado
 - Vector clocks
 - Logout funcional + exit do programa
 - Remover subscrição

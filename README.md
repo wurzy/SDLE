@@ -3,5 +3,5 @@
  
  The assignment was a peer-to-peer (P2P) decentralized timeline, built using Python and several frameworks such as Kademlia, Asyncio and Pymongo.
  
- * [Assingment] (https://github.com/wurzy/SDLE/tree/main/tp)
+ * [Assignment] (https://github.com/wurzy/SDLE/tree/main/tp)
  * [Classes] (https://github.com/wurzy/SDLE/tree/main/guioes)

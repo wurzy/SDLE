@@ -7,8 +7,6 @@ from random import choices
 from threading import Thread
 from timeline.timeline import Timeline
 
-HIERARCHY_BASELINE = settings.HIERARCHY_BASELINE
-REDIRECT_USERS = settings.REDIRECT_USERS
 KS = None
 LOOP = None
 USERNAME = None
@@ -17,7 +15,6 @@ LIST_LOOP = None
 TIMELINE = None
 NODE = None
 FOLLOWERS_CONS = None
-REDIRECT_CONS = None
 
 async def send_message_to_user(user, ip, port, message,
                                established_connections):
@@ -78,67 +75,6 @@ async def node_server(reader, writer):
 
             if new_follower in STATE['followers']:
                 writer.write(b'0\n')
-                await writer.drain()
-            elif len(STATE['followers']) >= HIERARCHY_BASELINE:
-
-                future = asyncio.run_coroutine_threadsafe(
-                                 KS.get_location_and_followers(
-                                    STATE['followers']), LOOP)
-                followers = future.result()
-
-                data = {
-                    "redirect": {
-                        "from": USERNAME,
-                        "to": new_follower
-                    }
-                }
-
-                json_string = json.dumps(data) + '\n'
-
-                users = dict(followers)
-                usernames = list(users.keys())
-
-                weights = [len(z) for (y, w, z) in users.values()]
-                weights = [1.0 / (w+.001) for w in weights]
-                sum_weights = sum(weights)
-                weights = [float(str(round(w / sum_weights, 4)))
-                           for w in weights]
-                print(weights)
-                weights[0] = float(str(round(1 - sum(weights[1:]), 4)))
-
-                users_weights = {}
-
-                for username, weight in zip(usernames, weights):
-                    users_weights[username] = weight
-
-                redirectors = 0
-
-                while redirectors < REDIRECT_USERS:
-                    diff = REDIRECT_USERS - redirectors
-                    draw_followers = []
-                    num = 0
-                    save = dict(users_weights)
-                    while num < diff:
-                        user = choices(
-                            list(save.keys()),
-                            weights=list(save.values()))
-                        save.pop(user[0])
-                        draw_followers.append(user[0])
-
-                        num += 1
-
-                    draw_followers = {user: users[user][0:2]
-                                      for user in draw_followers}
-
-                    draw_cons = {}
-
-                    success, insuccess = await send_message_to_users(
-                        draw_followers, json_string, draw_cons)
-                    redirectors += len(success)
-                    for user in [*success, *insuccess]:
-                        users_weights.pop(user)
-
-                writer.write(b'1\n')
                 await writer.drain()
             else:
                 STATE["followers"].append(new_follower)
@@ -209,36 +145,10 @@ async def node_server(reader, writer):
                     if messages != []:
                         await handle_messages(messages, thread_safe=True)
 
-            # Redirect messages if needed
-            json_string = json.dumps(data) + '\n'
-            if sender in STATE["redirect"]:
-
-                future = asyncio.run_coroutine_threadsafe(
-                    KS.get_location_and_followers(STATE["redirect"][sender]),
-                    LOOP)
-                redirects = future.result()
-
-                await send_message_to_users(redirects, json_string,
-                                            REDIRECT_CONS)
-
         elif 'online' in data:
             username = data['online']['username']
             NODE.add_follower_connection(username, reader, writer)
 
-        elif 'redirect' in data:
-            org = data["redirect"]["from"]
-            dst = data["redirect"]["to"]
-
-            if org in STATE["redirect"]:
-                STATE["redirect"].get(org).append(dst)
-            else:
-                STATE["redirect"][org] = [dst]
-
-            value = json.dumps(STATE)
-            future = asyncio.run_coroutine_threadsafe(
-                                KS.set_user(USERNAME, value),
-                                LOOP)
-            future.result()
         elif 'msgs_request' in data:
 
             user = data["msgs_request"]["username"]
@@ -286,7 +196,7 @@ class Listener(Thread):
 class Node:
     def __init__(self, address, port, username, ks, state):
         global KS, LOOP, USERNAME, TIMELINE, NODE, STATE
-        global FOLLOWERS_CONS, REDIRECT_CONS
+        global FOLLOWERS_CONS
 
         TIMELINE = Timeline(username)
         USERNAME = username
@@ -296,7 +206,6 @@ class Node:
         self.address = address
         self.port = port
         FOLLOWERS_CONS = {}
-        REDIRECT_CONS = {}
 
         self.following_cons = {}
         self.listener = Listener(self.address, self.port)
@@ -500,23 +409,6 @@ async def handle_messages(messages, thread_safe=False):
         msg_nr = msg["msg_nr"]
         time = msg["time"]
         TIMELINE.add_message(sender, message, msg_nr, time)
-
-        data = {
-            "post": msg
-        }
-
-        # Redirect messages if needed
-        json_string = json.dumps(data) + '\n'
-        if sender in STATE["redirect"]:
-            if(thread_safe):
-                future = asyncio.run_coroutine_threadsafe(
-                    KS.get_location_and_followers(STATE["redirect"][sender]),
-                    LOOP)
-                redirects = future.result()
-            else:
-                redirects = await KS.get_location_and_followers(
-                    STATE["redirect"][sender])
-            await send_message_to_users(redirects, json_string, REDIRECT_CONS)
 
         user_knowledge = STATE["following"][sender][0]
         user_knowledge_split = user_knowledge.split('-')

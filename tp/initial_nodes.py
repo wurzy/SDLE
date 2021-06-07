@@ -6,7 +6,6 @@ import configparser
 from kademlia.network import Server
 from threading import Thread
 
-
 class InitialNode(Thread):
     def __init__(self, port, bootstrap_address, bootstrap_port):
         Thread.__init__(self)

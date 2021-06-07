@@ -1,5 +1,5 @@
 import pymongo
-from datetime import datetime, timedelta
+from datetime import datetime
 
 class MongoController:
 
@@ -37,8 +37,7 @@ class MongoController:
                 user = user_msgs['user']
                 messages[user] = {}
                 for msg in user_msgs['messages']:
-                    msg['time'] = datetime.strptime(msg['time'],'%Y-%m-%d %H:%M:%S')
-                    msg['id'] = int(msg['id'])
+                    msg['time'] = datetime.strptime(str(msg['time']),'%Y-%m-%d %H:%M:%S.%f')
                     msg_nr = msg['msg_nr']
                     messages[user][str(msg_nr)] = msg
         except Exception as e:
@@ -54,8 +53,7 @@ class MongoController:
                 user = user_msgs['user']
                 messages[user] = {}
                 for msg in user_msgs['messages']:
-                    msg['time'] = datetime.strptime(msg['time'],'%Y-%m-%d %H:%M:%S')
-                    msg['id'] = int(msg['id'])
+                    msg['time'] = datetime.strptime(str(msg['time']),'%Y-%m-%d %H:%M:%S.%f')
                     msg_nr = msg['msg_nr']
                     messages[user][str(msg_nr)] = msg
         except Exception as e:

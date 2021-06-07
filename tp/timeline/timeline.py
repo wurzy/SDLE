@@ -1,9 +1,5 @@
-import json
-import os
-import configparser
 import threading
 import settings
-import utils.flake as flake
 
 from datetime import datetime, timedelta
 from mongo.connection import MongoController
@@ -12,10 +8,9 @@ DISCARD_BASELINE = settings.DISCARD_BASELINE
 
 
 class TimelineEntry:
-    def __init__(self, username, content, msg_id, msg_nr, time):
+    def __init__(self, username, content, msg_nr, time):
         self.username = username
         self.content = content
-        self.id = msg_id
         self.msg_nr = msg_nr
         self.time = time
         self.seen = False
@@ -24,7 +19,6 @@ class TimelineEntry:
         return {
             "username": self.username,
             "message": self.content,
-            "id": self.id,
             "msg_nr": self.msg_nr,
             "time": self.time,
             "seen": self.seen
@@ -48,15 +42,15 @@ class Timeline:
 
         self.save_messages()
 
-        messages = sorted(messages, key=lambda x: x['id'], reverse=True)
+        messages = sorted(messages, key=lambda x: str(x['time']), reverse=True)
 
         result = ""
 
         for msg in messages:
-            time = msg.get("time").strftime('%Y-%m-%d %H:%M:%S')
+            time = datetime.strptime(str(msg['time']),'%Y-%m-%d %H:%M:%S.%f')
 
             result += "-" * 79 + "\n"
-            result += time + " - " #+ "(" + str(msg.get("msg_nr")) + ")" 
+            result += time.strftime('%Y-%m-%d %H:%M:%S') + " - "
             result += msg.get("username") + ": " + msg.get("message")
             result += "\n"
 
@@ -71,8 +65,8 @@ class Timeline:
                 msgs.append({
                     "username": msg['username'],
                     "message": msg['message'],
-                    "id": msg['id'],
-                    "msg_nr": msg['msg_nr']
+                    "msg_nr": msg['msg_nr'],
+                    "time": msg['time']
                 })
 
         return msgs
@@ -80,7 +74,7 @@ class Timeline:
     def discard_messages(self):
         max_duration = timedelta(seconds=DISCARD_BASELINE)
 
-        discard_time = flake.get_datetime_now() - max_duration
+        discard_time = datetime.strptime(str(datetime.now()), "%Y-%m-%d %H:%M:%S.%f") - max_duration
 
         self.lock.acquire()
 
@@ -90,7 +84,7 @@ class Timeline:
             user_msgs = dict(msgs)
 
             for msg_nr, msg in msgs.items():
-                if msg['time'] < discard_time and msg['seen']:
+                if datetime.strptime(str(msg['time']), "%Y-%m-%d %H:%M:%S.%f") < discard_time and msg['seen']:
                     user_msgs.pop(msg_nr)
                 else:
                     break
@@ -104,10 +98,10 @@ class Timeline:
         else:
             return []
 
-    def add_message(self, user, message, msg_id, msg_nr, time,
+    def add_message(self, user, message, msg_nr, time,
                     user_knowledge=None):
 
-        timeline_entry = TimelineEntry(user, message, msg_id, msg_nr, time)
+        timeline_entry = TimelineEntry(user, message, msg_nr, time)
 
         self.lock.acquire()
 
@@ -145,34 +139,7 @@ class Timeline:
         self.save_messages()
 
     def get_timeline(self):
-        #try:
-        #    filename = 'messages/' + self.username + '-messages.json'
-        #    with open(filename, 'r') as infile:
-        #        data = json.load(infile)
-        #        for msgs in data.values():
-        #            for msg in msgs.values():
-        #                msg['time'] = datetime.strptime(
-        #                                       msg['time'],
-        #                                       '%Y-%m-%d %H:%M:%S')
-#
-        #        self.messages = data
-        #except:
-        #    self.messages = {}
         self.messages = self.mongo.getTimeline()
-
-        #try:
-        #    filename = 'messages/' + self.username + '-w-messages.json'
-        #    with open(filename, 'r') as infile:
-        #        data = json.load(infile)
-        #        for msgs in data.values():
-        #            for msg in msgs.values():
-        #                msg['time'] = datetime.strptime(
-        #                                       msg['time'],
-        #                                       '%Y-%m-%d %H:%M:%S')
-        #        self.waiting_messages = data
-        #except:
-        #    self.waiting_messages = {}
-
         self.waiting_messages = self.mongo.getQueue()
 
     def save_messages(self):
@@ -187,19 +154,11 @@ class Timeline:
             user_msgs = {}
             for msg_nr, msg in msgs.items():
                 new_msg = dict(msg)
-                new_msg['time'] = new_msg['time'].strftime('%Y-%m-%d %H:%M:%S')
-                new_msg['id'] = str(new_msg['id'])
+                new_msg['time'] = datetime.strptime(str(new_msg['time']), "%Y-%m-%d %H:%M:%S.%f")
                 user_msgs[msg_nr] = new_msg
             messages[user] = user_msgs
         self.mongo.saveMessages(messages)
         self.lock.release()
-        #if not os.path.isdir('messages'):
-        #    os.mkdir('messages')
-#
-        #filename = 'messages/' + self.username + '-messages.json'
-#
-        #with open(filename, 'w') as outfile:
-        #    json.dump(messages, outfile)
 
     def save_waiting_messages(self):
         messages = {}
@@ -208,17 +167,8 @@ class Timeline:
             user_msgs = {}
             for msg_nr, msg in msgs.items():
                 new_msg = dict(msg)
-                new_msg['time'] = new_msg['time'].strftime('%Y-%m-%d %H:%M:%S')
-                new_msg['id'] = str(new_msg['id'])
+                new_msg['time'] = datetime.strptime(str(new_msg['time']), "%Y-%m-%d %H:%M:%S.%f")
                 user_msgs[msg_nr] = new_msg
             messages[user] = user_msgs
         self.mongo.saveQueue(messages)
         self.lock.release()
-
-        #if not os.path.isdir('messages'):
-        #    os.mkdir('messages')
-#
-        #filename = 'messages/' + self.username + '-w-messages.json'
-#
-        #with open(filename, 'w') as outfile:
-        #    json.dump(messages, outfile)

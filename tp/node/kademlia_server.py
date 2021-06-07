@@ -1,6 +1,5 @@
 import logging
 import asyncio
-import sys
 import json
 import bcrypt
 
@@ -150,20 +149,6 @@ class KademliaServer:
                 res.append((follw, result["ip"], result["port"], msg_nr))
 
         return res
-
-    """ async def get_user_following(self, state):
-        following = {}
-
-        result = await self.get_user(username)
-
-        for follw in result["following"]:
-            result = await self.server.get(follw)
-            result = json.loads(result)
-            if result is not None:
-                following[follw] = (result["ip"],
-                                    result["port"])
-
-        return following """
 
     async def get_user(self, username):
         result = await self.server.get(username)

@@ -1,19 +1,14 @@
-import time
-import socket
-import configparser
-import os
 import argparse
 import sys
-import asyncio
 import settings
 import re
 import bcrypt
 
 from threading import Thread
-from kademlia_server import KademliaServer
-from node import Node
-from utils.menu.menu import Menu
-from utils.menu.menu_item import MenuItem
+from node.kademlia_server import KademliaServer
+from node.node import Node
+from menu.menu import Menu
+from menu.menu_item import MenuItem
 
 LOOP = None
 NODE = None
@@ -100,7 +95,7 @@ async def register(address, port):
     username = input("Username: ")
     password = input("Password: ")
 
-    salt = bcrypt.gensalt(rounds=16)
+    salt = bcrypt.gensalt(rounds=6)
     hash = bcrypt.hashpw(password.encode(), salt)
 
     try:

@@ -1,4 +1,12 @@
-TODO:
+Apresentaçao: 
+    - Tecnologias usadas (bcrypt, mongo)
+    - Arquitetura final 
+    - Features (unsusbcribe, register, ...)
+    - Problemas encontrados e como foram resolvidos -> vector clocks, ...
+    - Prints do programa a correr dum fluxo simples de mensagens
+
+
+ODO:
 
 DONE:
 

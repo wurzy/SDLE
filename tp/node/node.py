@@ -1,9 +1,7 @@
 import asyncio
 import json
-import settings
 
 from datetime import datetime
-from random import choices
 from threading import Thread
 from timeline.timeline import Timeline
 
